@@ -74,13 +74,10 @@ class FeverBuddy(Exception):
     def getDays(self):
         return self.days
     
-    def hotItems(self):
-
+    def getHotItems(self):
+        "get Hot Items from fever, returns a list"
         storyque = []
-
-        paramString =  "&links&offset=0&range=" + str(self.getDays()) + "&page=1"
-        self.setParams(paramString)
-
+        
         url = str(self.getEndpoint())+str(self.getParams())
 
         myJson = json.load(urllib.urlopen(url,urllib.urlencode(self.getApiKey())))
@@ -100,7 +97,12 @@ class FeverBuddy(Exception):
                 storyque.append(myJson['links'][x]['title'])
 
             x=x+1
-
+        
+        return storyque
+        
+    
+    def printHotItems(self,storyque=[]):
+        "should be called in conjunction with getHotItems()"
         for item in storyque:
             print item.encode('utf8')
 
@@ -144,7 +146,8 @@ def main(argv=None):
         fb.setApiKey()
         
         if hotitems == True:
-            fb.hotItems()
+            fb.setParams("&links&offset=0&range=",fb.getDays(),"&page=1")
+            fb.printHotItems(fb.getHotItems())
         
     except FeverBuddy, err:
         print >> sys.stderr, sys.argv[0].split("/")[-1] + ": " + str(err.msg)
